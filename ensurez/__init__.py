@@ -1,5 +1,5 @@
 import logging
-
+from jsonschema import validate
 
 def ensure_type(value, types, message=None):
     if not isinstance(value, types):
@@ -14,13 +14,18 @@ def ensure_in(value, values, message=None):
 
 
 def ensure_true(value, message=None):
-    message = message or 'value: %s must be True' % value
-    raise ValueError(message)
+    if not value:
+        message = message or 'value: %s must equals True' % value
+        raise ValueError(message)
 
 
-def try_it(func, *args, default=None, **kwargs):
+def ensure_safe(func, *args, default=None, **kwargs):
     try:
         return func(*args, **kwargs)
     except Exception as ex:
         logging.exception(ex)
         return default
+
+
+def ensure_schema(value, schema, message=None):
+    validate(value, schema)
